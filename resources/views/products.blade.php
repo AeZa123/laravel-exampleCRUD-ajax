@@ -28,7 +28,13 @@
                                 <input type="file" name="product_image" class="form-control">
                                 <span class="text-danger error-text product_image_error"></span>
                             </div>
-                            <button type="submit" class="btn btn-primary">Save product</button>
+
+                            <div class="img-holder text-center"></div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Save product</button>
+                            </div>
+
                         </form> 
                     </div>
                 </div>
@@ -51,6 +57,7 @@
     <script src="{{ asset('jquery.min.js') }}"></script>
     <script>
         $(function(){
+            //save product
             $('#form').on('submit', function(e){
                 e.preventDefault();
 
@@ -80,7 +87,37 @@
                 })
                 
                 
-            })
+            });
+            //reset image 
+            $('input[type="file"][name="product_image"]').val('');
+            //preview image
+            $('input[type="file"][name="product_image"]').on('change', function(){
+                var img_path = $(this)[0].value;
+                var img_holder = $('.img-holder');
+                var extension = img_path.substring(img_path.lastIndexOf('.')+1).toLowerCase();
+                
+
+                if(extension == 'jpeg' || extension == 'jpg' || extension == 'png') {
+                    // alert(extension);
+                    if(typeof(FileReader) != 'undefined') {
+                        img_holder.empty();
+                        var reader = new FileReader();
+                        reader.onload = function(e){
+                            $('<img/>', {'src':e.target.result,'class':'img-fluid','style':'max-width:300px;margin-bottom:10px;'}).
+                            appendTo(img_holder);
+                        }
+                        img_holder.show();
+                        reader.readAsDataURL($(this)[0].files[0])
+
+
+                    }else{
+                        $(img_holder).html('This browser does not support FileReader');
+                    }
+                }else{
+                    $(img_holder).empty();
+                }
+            });
+
         })
     </script>
 </body>
