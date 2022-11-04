@@ -47,5 +47,70 @@ class ProductController extends Controller
 
     }
 
+    public function fetchProducts(){
+        $products = Product::all();
+        // $data = \View::make('all_products')->with('products', $products)->render();
+        $data = view('all_products', ['products'=>$products])->render();
+        return response()->json(['code'=>1,'result'=>$data]);
+    }
+
+    public function getProductDetails(Request $request){
+        $product = Product::find($request->product_id);
+        return response()->json(['code'=>1,'result'=>$product]);
+    }
+
+
+    public function updateProduct(Request $request) {
+        $product_id = $request->pid;
+        $product = Product::find($product_id);
+        $path = 'files/';
+
+        $validator = \Validator::make($request->all(),[
+            'product_name' => 'required|string',
+            'product_image_update' => 'image',
+        ],[
+            'product_name.required' => 'กรุณาใส่ชื่อสินค้า',
+            'product_image_update.required' => 'กรุณาใส่รูปสินค้า',
+            'product_image_update.image' => 'นามสกุลไฟล์ภาพไม่ถูกต้อง *ต้องเป็นนามสกุล png, jpg, jpeg เท่านั้น'
+        ]);
+
+        if(!$validator->passes()){
+            return response()->json(['code'=>0, 'error'=>$validator->errors()->toArray()]);
+        }else{
+            //update product
+            if($request->hasFile('product_image_update')){
+                $file_path = $path.$product->product_image;
+
+                //delete old image
+                if($product->product_image != null && \Storage::disk('public')->exists($file_path)){
+                    \Storage::disk('public')->delete($file_path);
+                }
+
+                //update new image
+                $file = $request->file('product_image_update');
+                $file_name = time().'_'.$file->getClientOriginalName();
+                $upload = $file->storeAs($path, $file_name, 'public');
+
+                if($upload){
+                    $product->update([
+                        'product_name' => $request->product_name,
+                        'product_image' => $file_name
+                    ]);
+                    return response()->json(["code"=>1, "msg"=>"อัปเดตสินค้าสำเร็จ"]);
+                }
+
+
+            }else{
+                $product->update([
+                    'product_name' => $request->product_name,
+                ]);
+
+                return response()->json(['code'=>1, 'msg'=>'อัปเดตสินค้าสำเร็จ']);
+            }
+
+        }
+
+    }
+
 
 }
