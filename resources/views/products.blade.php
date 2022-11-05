@@ -67,12 +67,6 @@
 
         $(function(){
 
-            // $.ajaxSetup({
-            //     headers: {
-            //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            //     }
-            // });
-
             //save product
             $('#form').on('submit', function(e){
                 e.preventDefault();
@@ -227,6 +221,35 @@
 
                 });
             });
+
+
+
+            //delete product
+            $(document).on('click', '#deleteBtn', function(){
+                var product_id = $(this).data('id');
+                var url = '{{route("delete.product")}}';
+
+
+                if(confirm('ต้องการลบสินค้านี้หรือไม่ ?')){
+                    $.ajax({
+                        headers:{
+                            'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')
+                        },
+                        url:url,
+                        method:'POST',
+                        data:{product_id:product_id},
+                        dataType:'json',
+                        success:function(data){
+                            if(data.code == 1 ){
+                                fetchAllProducts();
+                            }else{
+                                alert(data.msg);
+                            }
+                        }
+                    })
+                }
+
+            })
 
 
 

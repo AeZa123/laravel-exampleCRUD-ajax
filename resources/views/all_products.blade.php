@@ -5,7 +5,7 @@
             <h5 class="mt-0 font-16">{{$item->product_name}}</h5>
             <div class="btn-group">
                 <button class="btn btn-sm btn-primary" data-id="{{$item->id}}" id="editBtn">Edit</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
+                <button class="btn btn-sm btn-danger" data-id="{{$item->id}}" id="deleteBtn">Delete</button>
             </div>
         </div>
     </div>
